@@ -33,6 +33,11 @@ void SaveFile(struct student students[100], int count)
 
 int main()
 {
+	//I'm putting a *lot* of the code into main here because it will be easier to screw with this way. Get ready for a long main function.
+
+
+
+
 	//make room for 100 students, can increase or decrease this
 	struct student students[100];
 
@@ -113,7 +118,7 @@ int main()
 			printf("Students:\n");
 			for (int j = 0; j < count; j++)
 			{
-				printf("\n%s, %s, %s, %d, %d, %d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
+				printf("\n%-20s, %-10s, %-30s, %-2d, %-2d, %-2d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
 			}
 			break;
 		}
@@ -136,14 +141,14 @@ int main()
 		{
 			//Add a student
 			//Take in input and insert the data at count, then increment count.
-			//Make sure to write to file here or call a function to do it
-			//Also there should be a cancel function. Maybe a blank input is good enough for that
+			//TODO: I handle an empty string being entered, but not a format error.
+			//maybe allow for CSV input? Probably just do manual input for now.
 			char info[500];
 			printf("Enter student information in this format:\nFullName,USF ID,Email,PresentationGrade,EssayGrade,TermProjectGrade:\n");
 			fgets(info, sizeof info, stdin); //eat buffer
 			fgets(info, sizeof info, stdin); //the real input is here
 			printf("%s", info);
-			if (info[0] != '\0')
+			if (info[0] != '\n')
 			{
 				char *rest = strdup(info);
 				token = "";
@@ -196,10 +201,8 @@ int main()
 			else
 			{
 				//empty string recieved, dont add anything
+				printf("Empty string encountered, add student canceled.\n");
 			}
-
-			//maybe allow for CSV input? Probably just do manual input for now.
-
 			break;
 		}
 		case 4:
