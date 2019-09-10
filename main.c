@@ -2,12 +2,6 @@
 #include <stdlib.h>
 #include <String.h>
 
-void ShowMenu()
-{
-	printf("\nWelcome to Class Roll!\nPlease select one of the following options:");
-	printf("\n1: Show all students\n2: Search for students\n3: Add a student\n4: Delete a student\n5: Edit a student's details\n6: Exit\n");
-}
-
 struct student
 {
 	char *name;
@@ -18,10 +12,29 @@ struct student
 	int tGrade;
 };
 
+void ShowMenu()
+{
+	printf("\nWelcome to Class Roll!\nPlease select one of the following options:");
+	printf("\n1: Show all students\n2: Search for students\n3: Add a student\n4: Delete a student\n5: Edit a student's details\n6: Exit\n");
+}
+
+void SaveFile(struct student students[100], int count)
+{
+	FILE *fp = fopen("students.csv", "w");
+	if (fp != NULL)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			fprintf(fp, "%s,%s,%s,%d,%d,%d\n", students[i].name, students[i].usfid, students[i].email, students[i].pGrade, students[i].eGrade, students[i].tGrade);
+		}
+	}
+	fclose(fp);
+}
+
 int main()
 {
 	//make room for 100 students, can increase or decrease this
-	struct student students[10];
+	struct student students[100];
 
 	FILE *fp = fopen("students.csv", "r");
 	const char s[] = ",";
@@ -177,7 +190,7 @@ int main()
 					i++;
 				}
 				count++;
-				//CallSomeSortOfFileWriteHere();
+				SaveFile(students, count);
 			}
 			else
 			{
@@ -208,7 +221,7 @@ int main()
 					printf("Deleted student belonging to USF ID: %s", uid);
 				}
 			}
-			//CallSomeSortOfFileWriteHere();
+			SaveFile(students, count);
 			break;
 		}
 		case 5:
