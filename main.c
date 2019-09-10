@@ -189,6 +189,7 @@ int main()
 					}
 					i++;
 				}
+				i = 0;
 				count++;
 				SaveFile(students, count);
 			}
