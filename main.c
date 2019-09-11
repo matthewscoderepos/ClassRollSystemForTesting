@@ -33,10 +33,10 @@ void SaveFile(struct student students[100], int count)
 
 int main()
 {
-	//I'm putting a *lot* of the code into main here because it will be easier to screw with this way. Get ready for a long main function.
+	//I'm putting a *lot* of the code into main here because it will be easier to screw with this way.
+	//Get ready for a long main function.
 
-
-
+	//Also theres no try catches and basically no validation (for now)
 
 	//make room for 100 students, can increase or decrease this
 	struct student students[100];
@@ -108,17 +108,18 @@ int main()
 		fgets(line, sizeof line, fp);
 		ShowMenu();
 		scanf("%d", &option);
+		fflush(stdin);
 		printf("\n");
-
 		switch (option)
 		{
 		case 1:
 		{
 			//Show all students
 			printf("Students:\n");
+			printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
 			for (int j = 0; j < count; j++)
 			{
-				printf("\n%-20s, %-10s, %-30s, %-2d, %-2d, %-2d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
+				printf("%-20s  %-10s  %-30s  %-10d  %-10d  %-10d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
 			}
 			break;
 		}
@@ -127,13 +128,13 @@ int main()
 			//Search for a student (just by uid right now, maybe add more options later?)
 			char uid[10];
 			printf("Enter a USF ID to search:\n");
-			fgets(uid, sizeof uid, stdin); //eat buffer
-			fgets(uid, sizeof uid, stdin); //the real input is here
-			printf("Student matching (USF ID):\n");
+			fgets(uid, sizeof uid, stdin); //the input
+			printf("Student matching USF ID:\n");
+			printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
 			for (int j = 0; j < count; j++)
 			{
 				if (!strcmp(uid, students[j].usfid))
-					printf("\n%s, %s, %s, %d, %d, %d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
+					printf("%-20s  %-10s  %-30s  %-10d  %-10d  %-10d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
 			}
 			break;
 		}
@@ -142,12 +143,11 @@ int main()
 			//Add a student
 			//Take in input and insert the data at count, then increment count.
 			//TODO: I handle an empty string being entered, but not a format error.
-			//maybe allow for CSV input? Probably just do manual input for now.
+			//maybe allow for CSV input?
+
 			char info[500];
 			printf("Enter student information in this format:\nFullName,USF ID,Email,PresentationGrade,EssayGrade,TermProjectGrade:\n");
-			fgets(info, sizeof info, stdin); //eat buffer
-			fgets(info, sizeof info, stdin); //the real input is here
-			printf("%s", info);
+			fgets(info, sizeof info, stdin); //the input
 			if (info[0] != '\n')
 			{
 				char *rest = strdup(info);
@@ -195,6 +195,7 @@ int main()
 					i++;
 				}
 				i = 0;
+				printf("Added student %s.\n", students[count].usfid);
 				count++;
 				SaveFile(students, count);
 			}
@@ -214,7 +215,7 @@ int main()
 
 			char uid[10];
 			printf("Enter a USF ID to delete that student:\n");
-			fgets(uid, sizeof uid, stdin); //eat buffer
+			//fgets(uid, sizeof uid, stdin); //eat buffer
 			fgets(uid, sizeof uid, stdin); //the real input is here
 			for (int j = 0; j < count; j++)
 			{
@@ -234,7 +235,68 @@ int main()
 
 			//This is a tricky one. Do we just read in all of the data on a usf id again, or do we let the user give an ID and then let
 			//them chose the data they want to change. Obviously easier the first way but better the second.
+
+			char input[10];
+			char newData[100];
 			printf("Enter a USF ID to edit that student:\n");
+			fgets(input, sizeof input, stdin); //the input
+			fflush(stdin);
+			printf("Student you are editing:\n");
+			printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
+			for (int j = 0; j < count; j++)
+			{
+				if (!strcmp(input, students[j].usfid))
+				{
+					printf("%-20s  %-10s  %-30s  %-10d  %-10d  %-10d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
+					printf("Which value would you like to edit? \n1: Name\n2: USF ID\n3: Email\n4: P Grade\n5: E Grade\n6: T Grade\n7: Cancel Edit\nPlease enter a number 1-7: ");
+					fgets(input, sizeof input, stdin);
+					fflush(stdin);
+					printf("Please enter the new data: ");
+					fgets(newData, sizeof newData, stdin);
+					fflush(stdin);
+					
+					switch (atoi(input))
+					{
+					case 1:
+					{
+						students[j].name = strdup(newData);
+						break;
+					}
+					case 2:
+					{
+						students[j].usfid = strdup(newData);
+						break;
+					}
+					case 3:
+					{
+						students[j].email = strdup(newData);
+						break;
+					}
+					case 4:
+					{
+						students[j].pGrade = atoi(strdup(newData));
+						break;
+					}
+					case 5:
+					{
+						students[j].eGrade = atoi(strdup(newData));
+						break;
+					}
+					case 6:
+					{
+
+						students[j].tGrade = atoi(strdup(newData));
+						break;
+					}
+					default:
+					{
+						printf("Incorrect option recieved. Canceling edit.");
+						break;
+					}
+					}
+				}
+			}
+
 			break;
 		}
 		case 6:
