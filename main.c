@@ -233,8 +233,7 @@ int main()
 		{
 			//Edit a student
 
-			//This is a tricky one. Do we just read in all of the data on a usf id again, or do we let the user give an ID and then let
-			//them chose the data they want to change. Obviously easier the first way but better the second.
+			//TODO: Editing details adds an extra newline
 
 			char input[10];
 			char newData[100];
@@ -253,6 +252,7 @@ int main()
 					fflush(stdin);
 					printf("Please enter the new data: ");
 					fgets(newData, sizeof newData, stdin);
+					strtok(newData, "\n"); //removes newline from end of entered data
 					fflush(stdin);
 					
 					switch (atoi(input))
