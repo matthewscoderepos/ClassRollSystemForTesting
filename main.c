@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <String.h>
+#include <stdbool.h>
 
 struct student
 {
@@ -31,12 +32,29 @@ void SaveFile(struct student students[100], int count)
 	fclose(fp);
 }
 
+bool CheckStudentFormat(char entered[500])
+{
+	int i = 0;
+	int num = 0;
+	while (entered[i] != '\n' && entered[i] != '\0')
+	{
+		if (entered[i] == ',')
+			num++;
+		i++;
+	}
+
+	if (num == 5)
+		return true;
+	else
+		return false;
+}
+
 int main()
 {
 	//I'm putting a *lot* of the code into main here because it will be easier to screw with this way.
 	//Get ready for a long main function.
 
-	//Also theres no try catches and basically no validation (for now)
+	//Also theres basically no validation (for now)
 
 	//make room for 100 students, can increase or decrease this
 	struct student students[100];
@@ -150,54 +168,62 @@ int main()
 			fgets(info, sizeof info, stdin); //the input
 			if (info[0] != '\n')
 			{
-				char *rest = strdup(info);
-				token = "";
-				while ((token = strdup(strtok_r(rest, ",", &rest))))
+				if (CheckStudentFormat(info))
 				{
-					switch (i)
+					char *rest = strdup(info);
+					token = "";
+					while ((token = strdup(strtok_r(rest, ",", &rest))))
 					{
-					case 0:
-					{
-						students[count].name = strdup(token);
-						break;
+						switch (i)
+						{
+						case 0:
+						{
+							students[count].name = strdup(token);
+							break;
+						}
+						case 1:
+						{
+							students[count].usfid = strdup(token);
+							break;
+						}
+						case 2:
+						{
+							students[count].email = strdup(token);
+							break;
+						}
+						case 3:
+						{
+							students[count].pGrade = atoi(token);
+							break;
+						}
+						case 4:
+						{
+							students[count].eGrade = atoi(token);
+							break;
+						}
+						case 5:
+						{
+							students[count].tGrade = atoi(token);
+							break;
+						}
+						default:
+						{
+							printf("Read in something for the wrong student");
+							break;
+						}
+						}
+						i++;
 					}
-					case 1:
-					{
-						students[count].usfid = strdup(token);
-						break;
-					}
-					case 2:
-					{
-						students[count].email = strdup(token);
-						break;
-					}
-					case 3:
-					{
-						students[count].pGrade = atoi(token);
-						break;
-					}
-					case 4:
-					{
-						students[count].eGrade = atoi(token);
-						break;
-					}
-					case 5:
-					{
-						students[count].tGrade = atoi(token);
-						break;
-					}
-					default:
-					{
-						printf("Read in something for the wrong student");
-						break;
-					}
-					}
-					i++;
+					i = 0;
+					printf("Added student %s.\n", students[count].usfid);
+					count++;
+					SaveFile(students, count);
 				}
-				i = 0;
-				printf("Added student %s.\n", students[count].usfid);
-				count++;
-				SaveFile(students, count);
+				else
+				{
+					printf("Incorrect format of student data. Canceling student add.\n");
+					break;
+				}
 			}
 			else
 			{
@@ -236,7 +262,7 @@ int main()
 			//TODO: Editing details adds an extra newline
 
 			char input[10];
-			char newData[100];
+			char newData[500];
 			printf("Enter a USF ID to edit that student:\n");
 			fgets(input, sizeof input, stdin); //the input
 			fflush(stdin);
@@ -254,7 +280,7 @@ int main()
 					fgets(newData, sizeof newData, stdin);
 					strtok(newData, "\n"); //removes newline from end of entered data
 					fflush(stdin);
-					
+
 					switch (atoi(input))
 					{
 					case 1:
@@ -296,7 +322,7 @@ int main()
 					}
 				}
 			}
-
+			SaveFile(students,count);
 			break;
 		}
 		case 6:
