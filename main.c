@@ -41,6 +41,22 @@ void SaveFile(struct student students[100], int count)
 	fclose(fp);
 }
 
+int StudentExists(struct student students[100], char *newUid, int count)
+{
+	int exists = 0;
+	for (int i = 0; i < count; i++)
+	{
+		if (!strcmp(newUid, students[i].usfid))
+		{
+			exists = 1;
+		}
+	}
+	if (exists)
+		return 1;
+	else
+		return 0;
+}
+
 int main()
 {
 	//make room for 100 students, can increase or decrease this
@@ -131,16 +147,17 @@ int main()
 		}
 		case 2:
 		{
-			//Search for a student (just by uid right now, maybe add more options later?)
-			char uid[10];
-			printf("Enter a USF ID to search:\n");
-			fgets(uid, sizeof uid, stdin); //the input
+			//Search for a student just by uid, name, or email
+			char search[40];
+			printf("Please enter either a name, USF ID, or email to search:\n");
+			fgets(search, sizeof search, stdin); //the input
 			int found = 0;
+			strtok(search, "\n"); //removes newline from end of entered data
 			for (int j = 0; j < count; j++)
 			{
-				if (!strcmp(uid, students[j].usfid))
+				if (!strcmp(search, students[j].name) || !strcmp(search, students[j].usfid) || !strcmp(search, students[j].email))
 				{
-					printf("Student matching USF ID:\n");
+					printf("Matching Students:\n");
 					printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
 					printf("%-20s  %-10s  %-30s  %-10d  %-10d  %-10d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
 					found = 1;
@@ -148,7 +165,7 @@ int main()
 			}
 			if (!found)
 			{
-				printf("Student matching USF ID %s not found.", strtok(uid, "\n"));
+				printf("No students matching the supplied string were found: %s", strtok(search, "\n"));
 			}
 			break;
 		}
@@ -159,12 +176,11 @@ int main()
 			//I handle empty string, wrong number of commas, missing info, and incorrect format of entered data. The format checking is not pretty,
 			//and I would have split this up a lot if I wasnt trying to keep as much as possible in main.
 
-			//TODO: Need to check if a UID already exists
 			//TODO: maybe allow for CSV input...
 
 			//Also using the goto function actually causes me stress.
 
-			char info[500];
+			char info[100];
 			printf("Enter student information in this format:\nFullName,USF ID,Email,PresentationGrade,EssayGrade,TermProjectGrade:\n");
 			fgets(info, sizeof info, stdin); //the input
 			if (info[0] != '\n')			 //if the string isnt empty
@@ -190,7 +206,7 @@ int main()
 						{
 						case 0:
 						{
-							if (strlen(token) > 3)
+							if (strlen(token) > 3 && strlen(token) <= 40)
 								students[count].name = strdup(token);
 							else
 								goto WRONGADD;
@@ -198,7 +214,7 @@ int main()
 						}
 						case 1:
 						{
-							if (strlen(token) == 9 && token[0] == 'U' && isdigit(token[1]) && isdigit(token[2]) && isdigit(token[3]) && isdigit(token[4]) && isdigit(token[5]) && isdigit(token[6]) && isdigit(token[7]) && isdigit(token[8]))
+							if (!StudentExists(students, token, count) && strlen(token) == 9 && token[0] == 'U' && isdigit(token[1]) && isdigit(token[2]) && isdigit(token[3]) && isdigit(token[4]) && isdigit(token[5]) && isdigit(token[6]) && isdigit(token[7]) && isdigit(token[8]))
 								students[count].usfid = strdup(token);
 							else
 								goto WRONGADD;
@@ -206,7 +222,7 @@ int main()
 						}
 						case 2:
 						{
-							if (strstr(token, "@") != NULL) //email formating sucks. just checking for the @ for now...
+							if (strstr(token, "@") != NULL && strlen(token) <= 40) //email formating sucks. just checking for the @ for now...
 								students[count].email = strdup(token);
 							else
 								goto WRONGADD;
@@ -252,7 +268,7 @@ int main()
 				else
 				{
 				WRONGADD:
-					printf("Incorrect format of student data. Canceling student add.\n");
+					printf("Incorrect format of student data or duplicate student. Canceling student add.\n");
 					break;
 				}
 			}
@@ -290,7 +306,7 @@ int main()
 			//Edit a student
 
 			char input[10];
-			char newData[500];
+			char newData[100];
 			printf("Enter a USF ID to edit that student:\n");
 			fgets(input, sizeof input, stdin); //the input
 			fflush(stdin);
@@ -316,48 +332,48 @@ int main()
 					{
 					case 0:
 					{
-						if (strlen(token) > 3)
-							students[j].name = strdup(token);
+						if (strlen(newData) > 3 && strlen(newData) <= 40)
+							students[j].name = strdup(newData);
 						else
 							goto WRONGEDIT;
 						break;
 					}
 					case 1:
 					{
-						if (strlen(token) == 9 && token[0] == 'U' && isdigit(token[1]) && isdigit(token[2]) && isdigit(token[3]) && isdigit(token[4]) && isdigit(token[5]) && isdigit(token[6]) && isdigit(token[7]) && isdigit(token[8]))
-							students[j].usfid = strdup(token);
+						if (!StudentExists(students, newData, count) && strlen(newData) == 9 && newData[0] == 'U' && isdigit(newData[1]) && isdigit(newData[2]) && isdigit(newData[3]) && isdigit(newData[4]) && isdigit(newData[5]) && isdigit(newData[6]) && isdigit(newData[7]) && isdigit(newData[8]))
+							students[j].usfid = strdup(newData);
 						else
 							goto WRONGEDIT;
 						break;
 					}
 					case 2:
 					{
-						if (strstr(token, "@") != NULL) //email formating sucks. just checking for the @ for now...
-							students[j].email = strdup(token);
+						if (strstr(newData, "@") != NULL && strlen(newData) < 40) //email formating sucks. just checking for the @ for now...
+							students[j].email = strdup(newData);
 						else
-							goto WRONGADD;
+							goto WRONGEDIT;
 						break;
 					}
 					case 3:
 					{
-						if (strlen(token) == 1 && isdigit(token[0]) && atoi(token) >= 0 && atoi(token) < 5)
-							students[j].pGrade = atoi(token);
+						if (strlen(newData) == 1 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
+							students[j].pGrade = atoi(newData);
 						else
 							goto WRONGEDIT;
 						break;
 					}
 					case 4:
 					{
-						if (strlen(token) == 1 && isdigit(token[0]) && atoi(token) >= 0 && atoi(token) < 5)
-							students[j].eGrade = atoi(token);
+						if (strlen(newData) == 1 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
+							students[j].eGrade = atoi(newData);
 						else
 							goto WRONGEDIT;
 						break;
 					}
 					case 5:
 					{
-						if (strlen(token) == 2 && isdigit(token[0]) && atoi(token) >= 0 && atoi(token) < 5)
-							students[j].tGrade = atoi(token);
+						if (strlen(newData) == 2 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
+							students[j].tGrade = atoi(newData);
 						else
 							goto WRONGEDIT;
 						break;
