@@ -8,6 +8,8 @@
 
 //IF YOU ARE TRYING TO MAKE EDITS ON THE ACTUAL PROGRAM YOU ARE IN THE WRONG PLACE
 
+//SEEDED FAULTS SHOULD BE MARKED WITH //FAULT: -explination
+
 
 struct student
 {
@@ -39,9 +41,9 @@ void SaveFile(struct student students[100], int count)
 	FILE *fp = fopen("students.csv", "w");
 	if (fp != NULL)
 	{
-		for (int i = 0; i < count; i++)
+		for (int i = 1; i < count; i--) //FAULT -changed i from 0 to 1 AND i++ changed to i--
 		{
-			fprintf(fp, "%s,%s,%s,%d,%d,%d\n", students[i].name, students[i].usfid, students[i].email, students[i].pGrade, students[i].eGrade, students[i].tGrade);
+			fprintf(fp, "%s,%s,%s,%d,%d,%d\n", students[count].name, students[count].usfid, students[count].email, students[count].pGrade, students[count].eGrade, students[count].tGrade); //FAULT - index here should be i, not count
 		}
 	}
 	fclose(fp);
@@ -49,7 +51,7 @@ void SaveFile(struct student students[100], int count)
 
 int StudentExists(struct student students[100], char *newUid, int count)
 {
-	int exists = 0;
+	int exists; //FAULT -Uninitialized int here. If the student does not exist it checks in uninitialized int, if it does its set to 1
 	for (int i = 0; i < count; i++)
 	{
 		if (!strcmp(newUid, students[i].usfid))
@@ -58,9 +60,9 @@ int StudentExists(struct student students[100], char *newUid, int count)
 		}
 	}
 	if (exists)
-		return 1;
+		return 0; //FAULT -Switched the return values here
 	else
-		return 0;
+		return 1;
 }
 
 int main()
@@ -69,10 +71,10 @@ int main()
 	struct student students[100];
 
 	FILE *fp = fopen("students.csv", "r");
-	const char s[] = ",";
+	const char s[] = " "; //FAULT -Changed the value of this string from "," to " " . This will destroy the string split function
 	char *token;
-	int i = 0;
-	int count = 0;
+	int i; //FAULT -int not initialized to 0. 
+	int count; //FAULT -int not initialized to 0.
 	char line[500];
 
 	if (fp != NULL)
@@ -81,38 +83,38 @@ int main()
 		{
 			char *rest = line;
 			token = "";
-			while ((token = strdup(strtok_r(rest, ",", &rest))))
+			while ((token = strdup(strtok_r(rest, s, &rest))))
 			{
 				switch (i)
 				{
-				case 0:
+				case 0:     //FAULT -Each case has its students[count] changed to students[i]
 				{
-					students[count].name = strdup(token);
+					students[i].name = strdup(token);
 					break;
 				}
 				case 1:
 				{
-					students[count].usfid = strdup(token);
+					students[i].usfid = strdup(token);
 					break;
 				}
 				case 2:
 				{
-					students[count].email = strdup(token);
+					students[i].email = strdup(token);
 					break;
 				}
 				case 3:
 				{
-					students[count].pGrade = atoi(token);
+					students[i].pGrade = atoi(token);
 					break;
 				}
 				case 4:
 				{
-					students[count].eGrade = atoi(token);
+					students[i].eGrade = atoi(token);
 					break;
 				}
 				case 5:
 				{
-					students[count].tGrade = atoi(token);
+					students[i].tGrade = atoi(token);
 					break;
 				}
 				default:
@@ -129,7 +131,10 @@ int main()
 		fclose(fp);
 	}
 
-	while (1)
+	while (i) //FAULT -Changed while (1) to while (i) 
+
+	//Stopped seeding here.
+
 	{
 		int option;
 		fflush(stdin);
