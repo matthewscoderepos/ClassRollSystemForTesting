@@ -3,6 +3,12 @@
 #include <String.h>
 #include <ctype.h>
 
+
+//THIS IS THE CODE BASE FOR THE FAULT SEEDED PROGRAM.
+
+//IF YOU ARE TRYING TO MAKE EDITS ON THE ACTUAL PROGRAM YOU ARE IN THE WRONG PLACE
+
+
 struct student
 {
 	char *name;
