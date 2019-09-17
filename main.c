@@ -8,7 +8,7 @@
 
 //IF YOU ARE TRYING TO MAKE EDITS ON THE ACTUAL PROGRAM YOU ARE IN THE WRONG PLACE
 
-//SEEDED FAULTS SHOULD BE MARKED WITH //FAULT: -explination
+//SEEDED FAULTS SHOULD BE MARKED WITH //FAULT -explination
 
 
 struct student
@@ -38,8 +38,8 @@ void ShowMenu()
 
 void SaveFile(struct student students[100], int count)
 {
-	FILE *fp = fopen("students.csv", "w");
-	if (fp != NULL)
+	FILE *fp = fopen("students.csv", "r"); //FAULT -changed "w" to "r", restricting the ability to write to the file
+	if (fp == NULL) //FAULT -changed !=NULL to ==NULL
 	{
 		for (int i = 1; i < count; i--) //FAULT -changed i from 0 to 1 AND i++ changed to i--
 		{
@@ -71,19 +71,19 @@ int main()
 	struct student students[100];
 
 	FILE *fp = fopen("students.csv", "r");
-	const char s[] = " "; //FAULT -Changed the value of this string from "," to " " . This will destroy the string split function
+	const char s[] = ","; 
 	char *token;
 	int i; //FAULT -int not initialized to 0. 
 	int count; //FAULT -int not initialized to 0.
 	char line[500];
 
-	if (fp != NULL)
+	if (fp == NULL) //FAULT -switched !=NULL to ==NULL
 	{
 		while (fgets(line, sizeof line, fp) != NULL)
 		{
 			char *rest = line;
 			token = "";
-			while ((token = strdup(strtok_r(rest, s, &rest))))
+			while ((token = strdup(strtok_r(rest, " ", &rest)))) //FAULT -Changed the value of this string from "," to " " . This will destroy the string split function
 			{
 				switch (i)
 				{
@@ -104,7 +104,7 @@ int main()
 				}
 				case 3:
 				{
-					students[i].pGrade = atoi(token);
+					students[i].eGrade = atoi(token); //FAULT -We can really screw around with these switches, here I just switched pGrade to eGrade. 
 					break;
 				}
 				case 4:
@@ -133,11 +133,9 @@ int main()
 
 	while (i) //FAULT -Changed while (1) to while (i) 
 
-	//Stopped seeding here.
-
 	{
 		int option;
-		fflush(stdin);
+		fflush(stdin);						//Can we just delete lines of code as a "bug"? if we dont flush the input it screws up... will ask prof
 		fgets(line, sizeof line, fp);
 		ShowMenu();
 		scanf("%d", &option);
@@ -152,7 +150,8 @@ int main()
 			printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
 			for (int j = 0; j < count; j++)
 			{
-				printf("%-20s  %-10s  %-30s  %-10d  %-10d  %-10d\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
+				//FAULT - the last 3 values here should be %-10d, not %-10s -- we can do this on all of the prints. 
+				printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", students[j].name, students[j].usfid, students[j].email, students[j].pGrade, students[j].eGrade, students[j].tGrade);
 			}
 			break;
 		}
@@ -162,7 +161,7 @@ int main()
 			char search[40];
 			printf("Please enter either a name, USF ID, or email to search:\n");
 			fgets(search, sizeof search, stdin); //the input
-			int found = 0;
+			int found; //FAULT -uninitialized int
 			strtok(search, "\n"); //removes newline from end of entered data
 			for (int j = 0; j < count; j++)
 			{
@@ -197,11 +196,11 @@ int main()
 			if (info[0] != '\n')			 //if the string isnt empty
 			{
 				i = 0;
-				int num = 0;
+				int num; //FAULT -uninitialized int
 				while (info[i] != '\n' && info[i] != '\0') //while not at the end of the string
 				{
 					//count the commas
-					if (info[i] == ',')
+					if (info[i] == ' ') //FAULT - switched ',' to ' ', destroys format check
 						num++;
 					i++;
 				}
@@ -217,7 +216,7 @@ int main()
 						{
 						case 0:
 						{
-							if (strlen(token) > 3 && strlen(token) <= 40)
+							if (strlen(token) > 3 && strlen(token) >= 40) //FAULT -switched <=40 to >=40
 								students[count].name = strdup(token);
 							else
 								goto WRONGADD;
@@ -225,7 +224,7 @@ int main()
 						}
 						case 1:
 						{
-							if (!StudentExists(students, token, count) && strlen(token) == 9 && token[0] == 'U' && isdigit(token[1]) && isdigit(token[2]) && isdigit(token[3]) && isdigit(token[4]) && isdigit(token[5]) && isdigit(token[6]) && isdigit(token[7]) && isdigit(token[8]))
+							if (StudentExists(students, token, count) && strlen(token) == 9 && token[0] == 'U' && isdigit(token[1]) && isdigit(token[2]) && isdigit(token[3]) && isdigit(token[3]) && isdigit(token[5]) && isdigit(token[6]) && isdigit(token[7]) && isdigit(token[8])) //FAULT -removed the negation on StudentExists. Should be !StudentExists() AND switched the 4th isDigit from [4] to [3]
 								students[count].usfid = strdup(token);
 							else
 								goto WRONGADD;
@@ -233,7 +232,7 @@ int main()
 						}
 						case 2:
 						{
-							if (strstr(token, "@") != NULL && strlen(token) <= 40) //email formating sucks. just checking for the @ for now...
+							if (strstr(token, "@") != NULL && strlen(token) >= 40) //email formating sucks. just checking for the @ for now... //FAULT - >=40 instead of <=40
 								students[count].email = strdup(token);
 							else
 								goto WRONGADD;
@@ -274,7 +273,7 @@ int main()
 					i = 0;
 					printf("Added student %s.\n", students[count].usfid);
 					count++;
-					SaveFile(students, count);
+					SaveFile(students, count - 1); //FAULT -changed count to count-1
 				}
 				else
 				{
@@ -304,7 +303,7 @@ int main()
 			{
 				if (!strcmp(uid, students[j].usfid))
 				{
-					students[j] = students[count - 1];
+					students[j] = students[count]; //FAULT - changed count-1 to count. This copies garbage into students[j] (or breaks the program, didnt test)
 					count--;
 					printf("Deleted student belonging to USF ID: %s\n", uid);
 				}
@@ -323,7 +322,7 @@ int main()
 			fflush(stdin);
 			for (int j = 0; j < count; j++)
 			{
-				if (!strcmp(input, students[j].usfid))
+				if (strcmp(input, students[j].usfid)) //FAULT -removed negation. should be !strcmp()
 				{
 					printf("Student you are editing:\n");
 					printf("%-20s  %-10s  %-30s  %-10s  %-10s  %-10s\n", "Name", "USF ID", "Email", "P Grade", "E Grade", "T Grade");
