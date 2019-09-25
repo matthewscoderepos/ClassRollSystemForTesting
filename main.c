@@ -1,7 +1,12 @@
-#include <stdio.h>
+#include <stdio.h>    
 #include <stdlib.h>
 #include <String.h>
 #include <ctype.h>
+#include <stdbool.h>  //FAULTS - adding useless header files to throw off group
+#include <malloc.h>   //
+#include <studentcreate.h>  //
+#include <studentdelete.h>  //
+#include <studentedit.h>   //
 
 
 //THIS IS THE CODE BASE FOR THE FAULT SEEDED PROGRAM.
@@ -88,14 +93,15 @@ int main()
 				switch (i)
 				{
 				case 0:     //FAULT -Each case has its students[count] changed to students[i]
+							//FAULT- Everyother case, break is moved to front
 				{
 					students[i].name = strdup(token);
 					break;
 				}
 				case 1:
 				{
-					students[i].usfid = strdup(token);
 					break;
+					students[i].usfid = strdup(token);
 				}
 				case 2:
 				{
@@ -104,8 +110,8 @@ int main()
 				}
 				case 3:
 				{
-					students[i].eGrade = atoi(token); //FAULT -We can really screw around with these switches, here I just switched pGrade to eGrade. 
 					break;
+					students[i].eGrade = atoi(token); //FAULT -We can really screw around with these switches, here I just switched pGrade to eGrade. 
 				}
 				case 4:
 				{
@@ -114,8 +120,8 @@ int main()
 				}
 				case 5:
 				{
-					students[i].tGrade = atoi(token);
 					break;
+					students[i].tGrade = atoi(token);
 				}
 				default:
 				{
@@ -405,6 +411,7 @@ int main()
 			//Exit
 
 			printf("Goodbye.\n");
+			main();   ///FAULT - run prgrm again instead of exiting
 			return 0;
 			break;
 		}
