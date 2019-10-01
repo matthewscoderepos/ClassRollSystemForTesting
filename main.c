@@ -330,7 +330,7 @@ int main()
 
 					switch (atoi(input))
 					{
-					case 0:
+					case 1:
 					{
 						if (strlen(newData) > 3 && strlen(newData) <= 40)
 							students[j].name = strdup(newData);
@@ -338,7 +338,7 @@ int main()
 							goto WRONGEDIT;
 						break;
 					}
-					case 1:
+					case 2:
 					{
 						if (!StudentExists(students, newData, count) && strlen(newData) == 9 && newData[0] == 'U' && isdigit(newData[1]) && isdigit(newData[2]) && isdigit(newData[3]) && isdigit(newData[4]) && isdigit(newData[5]) && isdigit(newData[6]) && isdigit(newData[7]) && isdigit(newData[8]))
 							students[j].usfid = strdup(newData);
@@ -346,7 +346,7 @@ int main()
 							goto WRONGEDIT;
 						break;
 					}
-					case 2:
+					case 3:
 					{
 						if (strstr(newData, "@") != NULL && strlen(newData) < 40) //email formating sucks. just checking for the @ for now...
 							students[j].email = strdup(newData);
@@ -354,7 +354,7 @@ int main()
 							goto WRONGEDIT;
 						break;
 					}
-					case 3:
+					case 4:
 					{
 						if (strlen(newData) == 1 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
 							students[j].pGrade = atoi(newData);
@@ -362,7 +362,7 @@ int main()
 							goto WRONGEDIT;
 						break;
 					}
-					case 4:
+					case 5:
 					{
 						if (strlen(newData) == 1 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
 							students[j].eGrade = atoi(newData);
@@ -370,9 +370,9 @@ int main()
 							goto WRONGEDIT;
 						break;
 					}
-					case 5:
+					case 6:
 					{
-						if (strlen(newData) == 2 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
+						if (strlen(newData) == 1 && isdigit(newData[0]) && atoi(newData) >= 0 && atoi(newData) < 5)
 							students[j].tGrade = atoi(newData);
 						else
 							goto WRONGEDIT;
