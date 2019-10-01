@@ -16,6 +16,7 @@
 //SEEDED FAULTS SHOULD BE MARKED WITH //FAULT -explination
 
 
+//Struct for student object
 struct student
 {
 	char *name;
@@ -26,6 +27,7 @@ struct student
 	int tGrade;
 };
 
+//Main menu of program
 void ShowMenu()
 {
 	printf("\n#################################################\n");
@@ -36,11 +38,12 @@ void ShowMenu()
 	printf("# 3: Add a student                              #\n");
 	printf("# 4: Delete a student                           #\n");
 	printf("# 5: Edit a student's details                   #\n");
-	printf("# 6: Exit                                       #\n");
+	printf("# 6: Exit                                       #\n");exit(0); // FAULT - exit program early 
 	printf("#################################################\n");
 	printf("Option: ");
 }
 
+//Write and save data to CSV file
 void SaveFile(struct student students[100], int count)
 {
 	FILE *fp = fopen("students.csv", "r"); //FAULT -changed "w" to "r", restricting the ability to write to the file
@@ -51,9 +54,10 @@ void SaveFile(struct student students[100], int count)
 			fprintf(fp, "%s,%s,%s,%d,%d,%d\n", students[count].name, students[count].usfid, students[count].email, students[count].pGrade, students[count].eGrade, students[count].tGrade); //FAULT - index here should be i, not count
 		}
 	}
-	fclose(fp);
+	fopen(fp); //FAULT - changed fclose to fopen
 }
 
+//Function to check wether the student exists 
 int StudentExists(struct student students[100], char *newUid, int count)
 {
 	int exists; //FAULT -Uninitialized int here. If the student does not exist it checks in uninitialized int, if it does its set to 1
@@ -423,5 +427,5 @@ int main()
 		}
 	}
 
-	return 0;
+	return; //FAULT - changed return 0 to return to exit main function
 }
